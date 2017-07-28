@@ -112,7 +112,7 @@ var colors = d3.scale.category20();
 //var alldata = null
 
 // margins
-var margin = {top: 40, right: 20, bottom: 30, left: 40}
+var margin = {top: 40, right: 20, bottom: 30, left: 60}
 
 // Original Width
 var width = parseInt(svg.style("width"));
@@ -126,11 +126,17 @@ var barHeight = 20;
 
 var render = function() {
 
-  var max = d3.max(data, function(d) { return +d[1];} );
+var graphW = width - margin.left;
+  var max = d3.max(data, function(d) { return +d[2];} );
+  var sf = graphW/max;  //scale factor
+
+console.log("WWW " + width + " MAX: " + max + " SF " + sf);
+
 
   x = d3.scale.linear()
-  .domain([0, d3.max(data, function(d) {return d[1]})])
-  .range([0, width]);
+  .domain([0, d3.max(data, function(d) {return d[2]})])
+  .range([0, graphW]);
+  //.range([0, width]);
 
   xAxis = d3.svg.axis()
     .scale(x)
@@ -167,7 +173,8 @@ var render = function() {
   bar.enter().append("g")
       .attr("class", "proteinbar")
       .attr("transform", function(d, i) {
-        return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
+        //return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
+        return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
       });
 
   bar.append("a")
@@ -176,9 +183,9 @@ var render = function() {
           .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
     })
     .append("rect")
-    .attr("width", function(d) { return d[2]})
+    .attr("width", function(d) { return d[2]*sf})
     .attr("height", barHeight - 1)
-    .style("fill", function(d, i) { return colors(d[3])});
+    .style("fill", function(d, i) { return colors(d[6])});
 
   bar.append("a")
     .on("mouseover", function(d){
@@ -186,16 +193,31 @@ var render = function() {
           .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
       })
     .append("text")
-    .attr("x", function(d) { return d[2] - 3; })
+    .attr("x", function(d) { return d[2]*sf - 3; })
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
+    // .text(function(d) { return (d[5] + "-" + d[6] + ": " + d[2] )});
+    .text(function(d) { return (d[6] + ": " + d[2] )});
+
+bar.append("a")
+  .on("mouseover", function(d){
+    d3.select(this)
+        .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
+    })
+  .append("text")
+  .attr("x", -50)
+  .attr("y", barHeight / 2)
+  .attr("dy", ".35em")
 //      .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": "+ d[3] + " " + d[4])});
-    .text(function(d) { return (d[2]+": "+ d[3] + "      " + d[4] + " -- " + d[5])});
+  .text(function(d) { return (d[5])});
+
+
 
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", function(d, i) {
-        return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
+        //return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
+        return "translate(" + margin.left  + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
       .call(xAxis);
 
     svg.append("rect")
@@ -203,16 +225,16 @@ var render = function() {
       .attr("x", 0)
       .attr("y", (margin.top - 5))
       .attr("height", (10 + barHeight * data.length))
-      .attr("width", width)
+      .attr("width", width -15)
       .style("stroke", "grey")
       .style("fill", "none")
       .style("stroke-width", 1);
-
 }
 
 var range = function(d) {
-  var beginning = x(d[0]);
-  var end = x(d[1]);
+  //var beginning = x(d[0]);
+  var beginning = 0;
+  var end = x(d[2]);
   var range = end - beginning;
   //console.log("range", end - beginning);
   return range;
@@ -222,6 +244,8 @@ var rescale = function() {
 
   // The new width of the SVG element
   var newwidth = parseInt(svg.style("width"));
+  var max = d3.max(data, function(d) { return +d[2];} );
+  var sf= (newwidth - margin.left)/max;
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
   x.range([0, newwidth]);
@@ -230,22 +254,25 @@ var rescale = function() {
   var bar = svg.selectAll(".proteinbar").data(data)
 
   bar.attr("transform", function(d, i) {
-        return "translate(" + x(d[0]) + "," + (margin.top + (i * barHeight)) + ")";
+        //return "translate(" + x(d[2]) + "," + (margin.top + (i * barHeight)) + ")";
+        //return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
+        return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
       });
 
   // For each bar group, select the rect and reposition it using the new scale.
   bar.select("rect")
       .attr("width", function(d) { return range(d); })
       .attr("height", barHeight - 1)
-      .style("fill", function(d, i) { return colors(d[3])});
+      .style("fill", function(d, i) { return colors(d[6])});
 
   // Also reposition the bars using the new scales.
   bar.select("text")
-      .attr("x", function(d) { return range(d) - 3; })
+      //.attr("x", function(d) { return range(d) - 3; })
+      .attr("x", function(d) { return d[2]*sf - 3; })
       .attr("y", barHeight / 2)
       .attr("dy", ".35em")
       // .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": " + d[3] + " " + d[4])});
-      .text(function(d) { return (d[2]+": "+ d[3] + "    " + d[4] + " -- " + d[5])});
+      .text(function(d) { return (d[6] + ": " + d[2] )});
 
   // resize the bounding box
   var bb = svg.select(".boundingbox").attr("width", newwidth);
@@ -255,11 +282,9 @@ var rescale = function() {
   svg.select(".x.axis").call(xAxis);
 
   // resize the header
-  head = svg.select(".myheader").attr("width",newwidth);
+  head = svg.select(".myheader").attr("width", newwidth);
 
 }
-
-// Fetch our JSON and feed it to the draw function
 
 // Fetch our JSON and feed it to the draw function
 
