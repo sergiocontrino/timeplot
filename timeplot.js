@@ -193,7 +193,8 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf);
           .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
       })
     .append("text")
-    .attr("x", function(d) { return d[2]*sf - 3; })
+    //.attr("x", function(d) { return d[2]*sf - 3; })
+    .attr("x", 0)
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
     // .text(function(d) { return (d[5] + "-" + d[6] + ": " + d[2] )});
@@ -266,13 +267,14 @@ var rescale = function() {
       .style("fill", function(d, i) { return colors(d[6])});
 
   // Also reposition the bars using the new scales.
-  bar.select("text")
-      //.attr("x", function(d) { return range(d) - 3; })
-      .attr("x", function(d) { return d[2]*sf - 3; })
-      .attr("y", barHeight / 2)
-      .attr("dy", ".35em")
-      // .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": " + d[3] + " " + d[4])});
-      .text(function(d) { return (d[6] + ": " + d[2] )});
+  // bar.select("text")
+  //     //.attr("x", function(d) { return range(d) - 3; })
+  //     //.attr("x", function(d) { return d[2]*sf - 3; })
+  //     .attr("x", 0)
+  //     .attr("y", barHeight / 2)
+  //     .attr("dy", ".35em")
+  //     // .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": " + d[3] + " " + d[4])});
+  //     .text(function(d) { return (d[6] + ": " + d[2] )});
 
   // resize the bounding box
   var bb = svg.select(".boundingbox").attr("width", newwidth);
