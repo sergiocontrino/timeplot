@@ -107,10 +107,6 @@ var EPORTAL = "portal.do?class=RnaseqExperiment&externalids=";
 var svg = d3.select("#" + svgId);
 
 var colors = d3.scale.category20();
-//var colors = d3.scale.category10();
-
-// Will hold our data
-//var alldata = null
 
 // margins
 var margin = {top: 40, right: 20, bottom: 30, left: 60}
@@ -124,7 +120,6 @@ var xAxis = null;
 
 // Static bar type:
 var barHeight = 10;
-var semibar = barHeight/2;
 
 var render = function() {
 
@@ -159,7 +154,7 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
       .attr('height', 20)
       //.attr('fill', )
       .append("xhtml:body")
-      .html('<h3 class="goog"> ' + data.length + ' Protein Domain Regions - source: InterPro</h3>\
+      .html('<h3 class="goog"> ' + groups + ' Digestion Time Points - source: InterPro</h3>\
              <p> <p>');
 
   // Size our SVG tall enough so that it fits each bar.
@@ -171,8 +166,6 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
   // Draw our elements!!
   var bar = svg.selectAll("g")
       .data(data)
-
-  //var spacer = 0;
 
   // New bars: note: ceil to divide by replicates
   bar.enter().append("g")
@@ -219,8 +212,6 @@ bar.append("a")
 //      .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": "+ d[3] + " " + d[4])});
   .text(function(d,i) { if (i == 0 || i%3 == 2) return (d[5])});
 
-//if (i == 1) spacer=spacer +5;
-
 
   svg.append("g")
       .attr("class", "x axis")
@@ -264,7 +255,6 @@ var rescale = function() {
 
   bar.attr("transform", function(d, i) {
         //return "translate(" + x(d[2]) + "," + (margin.top + (i * barHeight)) + ")";
-        //return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
         //return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
         return "translate(" + margin.left + "," + (margin.top + ((i + Math.ceil(i/3)) * barHeight)) + ")";
       });
