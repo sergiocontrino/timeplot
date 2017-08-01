@@ -123,7 +123,8 @@ var x= null;
 var xAxis = null;
 
 // Static bar type:
-var barHeight = 20;
+var barHeight = 10;
+var semibar = barHeight/2;
 
 var render = function() {
 
@@ -171,12 +172,14 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
   var bar = svg.selectAll("g")
       .data(data)
 
-  // New bars:
+  //var spacer = 0;
+
+  // New bars: note: ceil to divide by replicates
   bar.enter().append("g")
       .attr("class", "proteinbar")
       .attr("transform", function(d, i) {
         //return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
-        return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
+        return "translate(" + margin.left + "," + (margin.top + ((i + Math.ceil(i/3)) * barHeight)) + ")";
       });
 
   bar.append("a")
@@ -199,6 +202,8 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
     .attr("x", 0)
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
+    //.attr("fill", "gray")
+    .attr("font-size", "10px")
     // .text(function(d) { return (d[5] + "-" + d[6] + ": " + d[2] )});
     .text(function(d) { return (d[6] + ": " + d[2] )});
 
@@ -212,22 +217,23 @@ bar.append("a")
   .attr("y", barHeight / 2)
   .attr("dy", ".35em")
 //      .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": "+ d[3] + " " + d[4])});
-  .text(function(d) { return (d[5])});
+  .text(function(d,i) { if (i == 0 || i%3 == 2) return (d[5])});
 
+//if (i == 1) spacer=spacer +5;
 
 
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", function(d, i) {
         //return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
-        return "translate(" + margin.left  + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
+        return "translate(" + margin.left  + "," + (margin.top + (barHeight * (data.length + groups)) +5 ) + ")"})
       .call(xAxis);
 
     svg.append("rect")
       .attr("class", "boundingbox")
       .attr("x", 0)
       .attr("y", (margin.top - 5))
-      .attr("height", (10 + barHeight * data.length))
+      .attr("height", (10 + barHeight * (data.length + groups)))
       .attr("width", width -15)
       .style("stroke", "grey")
       .style("fill", "none")
@@ -248,7 +254,7 @@ var rescale = function() {
   // The new width of the SVG element
   var newwidth = parseInt(svg.style("width"));
   var max = d3.max(data, function(d) { return +d[2];} );
-  var sf= (newwidth - margin.left)/max;
+  var sf= (newwidth - 2*margin.left)/max;
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
   x.range([0, newwidth]);
@@ -259,7 +265,8 @@ var rescale = function() {
   bar.attr("transform", function(d, i) {
         //return "translate(" + x(d[2]) + "," + (margin.top + (i * barHeight)) + ")";
         //return "translate(" + 0 + "," + (margin.top + (i * barHeight)) + ")";
-        return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
+        //return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
+        return "translate(" + margin.left + "," + (margin.top + ((i + Math.ceil(i/3)) * barHeight)) + ")";
       });
 
   // For each bar group, select the rect and reposition it using the new scale.
@@ -279,7 +286,7 @@ var rescale = function() {
   //     .text(function(d) { return (d[6] + ": " + d[2] )});
 
   // resize the bounding box
-  var bb = svg.select(".boundingbox").attr("width", newwidth);
+  var bb = svg.select(".boundingbox").attr("width", newwidth -15);
 
   // resize the x axis
   xAxis.scale(x);
