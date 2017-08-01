@@ -30,6 +30,7 @@ var DEFAULT_MINEURL = "http://rumenmine-dev.ibers.aber.ac.uk/rumenmine-dev";
 var DEFAULT_ID = "p15539";
 var DEFAULT_SVG = "tchart";
 var DEFAULT_TYPE = "Gene";
+var DEFAULT_REPLICATE = 3; // use for groups
 
 if(typeof mineUrl === 'undefined'){
    mineUrl = DEFAULT_MINEURL;
@@ -126,12 +127,13 @@ var barHeight = 20;
 
 var render = function() {
 
-var graphW = width - margin.left;
-  var max = d3.max(data, function(d) { return +d[2];} );
-  var sf = graphW/max;  //scale factor
+var graphW = width -2*margin.left ;
+var max = d3.max(data, function(d) { return +d[2];} );
+var sf = graphW/max;  //scale factor
 
-console.log("WWW " + width + " MAX: " + max + " SF " + sf);
+var groups=(data.length -1)/3;
 
+console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
 
   x = d3.scale.linear()
   .domain([0, d3.max(data, function(d) {return d[2]})])
@@ -161,7 +163,7 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf);
 
   // Size our SVG tall enough so that it fits each bar.
   // Width was already defined when we loaded.
-  svg.attr("height", margin.top + (barHeight * data.length) + margin.bottom);
+  svg.attr("height", margin.top + (barHeight * (data.length + groups) + margin.bottom));
 
   }
 
