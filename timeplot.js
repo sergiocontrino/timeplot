@@ -95,9 +95,7 @@ var EPORTAL = "portal.do?class=RnaseqExperiment&externalids=";
 //================
 
 
-
 var svg = d3.select("#" + svgId);
-
 var colors = d3.scale.category20();
 
 // margins
@@ -175,7 +173,8 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
           .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
     })
     .append("rect")
-    .attr("width", function(d) { return d[2]*sf})
+    .attr("data-legend", function(d) { return d[6] })
+    .attr("width", function(d) { return d[2]*sf })
     .attr("height", barHeight - 1)
     .style("fill", function(d, i) { return colors(d[6])});
 
@@ -221,14 +220,25 @@ bar.append("a")
       .style("stroke", "grey")
       .style("fill", "none")
       .style("stroke-width", 1);
+
+svg.append("g")
+.attr("class","legend")
+//.attr("transform","translate(" + (width - margin.left)  + "," + 2*margin.top +")")
+.attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
+.style("font-size","12px")
+.call(d3.legend);
+
 }
+
+
+
+
 
 var range = function(d) {
   //var beginning = x(d[0]);
   var beginning = 0;
   var end = x(d[2]);
   var range = end - beginning;
-  //console.log("range", end - beginning);
   return range;
 }
 
@@ -237,7 +247,6 @@ var rescale = function() {
   // The new width of the SVG element
   var newwidth = parseInt(svg.style("width"));
   var max = d3.max(data, function(d) { return +d[2];} );
-  //var sf= (newwidth - 3*margin.left)/max;
   var newgraphW= (newwidth - 3*margin.left);
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
@@ -248,8 +257,6 @@ var rescale = function() {
   var bar = svg.selectAll(".proteinbar").data(data)
 
   bar.attr("transform", function(d, i) {
-        //return "translate(" + x(d[2]) + "," + (margin.top + (i * barHeight)) + ")";
-        //return "translate(" + margin.left + "," + (margin.top + (i * barHeight)) + ")";
         return "translate(" + margin.left + "," + (margin.top + ((i + Math.ceil(i/3)) * barHeight)) + ")";
       });
 
@@ -290,8 +297,6 @@ if(typeof token === 'undefined' || token === null){
  } else { // normal workings
    myService = new imjs.Service({root: mineUrl, token: token});
 };
-
-//var myService = new imjs.Service({root: mineUrl, token: token});
 
 
 myService.rows(query).then(function(rows) {
