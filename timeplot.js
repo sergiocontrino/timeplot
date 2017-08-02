@@ -1,28 +1,14 @@
 /* script used by the report page of thalemine (report.jsp), if protein
 //
-// INPUT:   - the protein id (primaryIdentifier)
-//          - the mine url (if not present, defaults to araport)
-// OUTPUT:  bar chart displaying the various domains associated with the protein
+// INPUT:   - the gene id (primaryIdentifier)
+//          - the mine url (if not present, defaults to rumenmine)
+// OUTPUT:  bar chart displaying the various expression levels grouped by
+//          replicates
 //
 */
 
 // to set the mine: could be done inside js with injection
 // here using a parameter from jsp
-
-/*
-var BASEURL = mineUrl + "/service/query/results?query=";
-var QUERYSTART = "%3Cquery%20model=%22genomic%22%20view=%22" +
-"Protein.proteinDomainRegions.start%20Protein.proteinDomainRegions.end%20" +
-"Protein.proteinDomainRegions.database%20Protein.proteinDomainRegions.identifier%20" +
-"Protein.proteinDomainRegions.proteinDomain.shortName%20" +
-"Protein.proteinDomainRegions.proteinDomain.primaryIdentifier%22%20%3E%20%3C" +
-// "Protein.proteinDomainRegions.proteinDomain.primaryIdentifier%20" +
-// "Protein.proteinDomainRegions.id%22%20%3E%20%3C" +
-"constraint%20path=%22Protein.primaryIdentifier%22%20op=%22=%22%20value=%22";
-var QUERYEND="%22/%3E%20%3C/query%3E";
-var QUERY= BASEURL + QUERYSTART + queryId + QUERYEND;
-var PORTAL = "portal.do?class=ProteinDomain&externalids=";
-*/
 
 
 // DEFAULTS
@@ -48,9 +34,15 @@ if(typeof type === 'undefined'){
    type  = DEFAULT_TYPE;
  };
 
+if(typeof replicatesNr === 'undefined'){
+   replicatesNr  = DEFAULT_REPLICATE;
+ };
+
+
 var constraintOp = '=';
 var constraintPath = 'primaryIdentifier';
 
+// to rm
 if(typeof listName != 'undefined'){ // set only on a bagDetails page
     queryId = listName;
     constraintOp = 'IN';
@@ -109,7 +101,7 @@ var svg = d3.select("#" + svgId);
 var colors = d3.scale.category20();
 
 // margins
-var margin = {top: 40, right: 20, bottom: 30, left: 60}
+var margin = {top: 40, right: 120, bottom: 30, left: 60}
 
 // Original Width
 var width = parseInt(svg.style("width"));
@@ -123,13 +115,13 @@ var barHeight = 10;
 
 var render = function() {
 
-var graphW = width -2*margin.left ;
+var graphW = width -3*margin.left ;
 var max = d3.max(data, function(d) { return +d[2];} );
 var sf = graphW/max;  //scale factor
 
-var groups=(data.length -1)/3;
+var groups=(data.length -1)/replicatesNr;   // -1: the starting state (grass)
 
-console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
+console.log("WWW " + width + " MAX: " + max + " -- " + groups);
 
   x = d3.scale.linear()
   .domain([0, d3.max(data, function(d) {return d[2]})])
@@ -194,13 +186,11 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
         .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
       })
     .append("text")
-    //.attr("x", function(d) { return d[2]*sf - 3; })
     .attr("x", 0)
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
     //.attr("fill", "gray")
     .attr("font-size", "10px")
-    // .text(function(d) { return (d[5] + "-" + d[6] + ": " + d[2] )});
     .text(function(d) { return (d[6] + ": " + d[2] )});
 
 bar.append("a")
@@ -212,15 +202,14 @@ bar.append("a")
   .attr("x", -50)
   .attr("y", barHeight / 2)
   .attr("dy", ".35em")
-//      .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": "+ d[3] + " " + d[4])});
+  // group by replicates
   .text(function(d,i) { if (i == 0 || i%3 == 2) return (d[5])});
-
 
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", function(d, i) {
         //return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
-        return "translate(" + margin.left  + "," + (margin.top + (barHeight * (data.length + groups)) +5 ) + ")"})
+        return "translate(" + margin.left  + "," + (margin.top + (barHeight * (data.length + groups)) + 5 ) + ")"})
       .call(xAxis);
 
     svg.append("rect")
@@ -248,10 +237,12 @@ var rescale = function() {
   // The new width of the SVG element
   var newwidth = parseInt(svg.style("width"));
   var max = d3.max(data, function(d) { return +d[2];} );
-  var sf= (newwidth - 2*margin.left)/max;
+  //var sf= (newwidth - 3*margin.left)/max;
+  var newgraphW= (newwidth - 3*margin.left);
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
-  x.range([0, newwidth]);
+  //x.range([0, newwidth]);
+  x.range([0, newgraphW]);
 
   // Use our existing data:
   var bar = svg.selectAll(".proteinbar").data(data)
