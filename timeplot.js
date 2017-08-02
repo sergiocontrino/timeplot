@@ -154,7 +154,7 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
       .attr('height', 20)
       //.attr('fill', )
       .append("xhtml:body")
-      .html('<h3 class="goog"> ' + groups + ' Digestion Time Points - source: InterPro</h3>\
+      .html('<h3 class="goog"> ' + groups + ' Digestion Time Points </h3>\
              <p> <p>');
 
   // Size our SVG tall enough so that it fits each bar.
@@ -178,7 +178,9 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
   bar.append("a")
     .on("mouseover", function(d, i){
       d3.select(this)
-          .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
+          .attr({"xlink:href": mineUrl + EPORTAL + d[4]})
+          // p15559: Hour1 Cow2 -> 86 un
+          .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
     })
     .append("rect")
     .attr("width", function(d) { return d[2]*sf})
@@ -188,7 +190,8 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
   bar.append("a")
     .on("mouseover", function(d){
       d3.select(this)
-          .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
+        .attr({"xlink:href": mineUrl + EPORTAL + d[4]})
+        .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
       })
     .append("text")
     //.attr("x", function(d) { return d[2]*sf - 3; })
@@ -203,7 +206,7 @@ console.log("WWW " + width + " MAX: " + max + " SF " + sf + " -- " + groups);
 bar.append("a")
   .on("mouseover", function(d){
     d3.select(this)
-        .attr({"xlink:href": mineUrl + GPORTAL + d[5]});
+        .attr({"xlink:href": mineUrl + EPORTAL + d[4]});
     })
   .append("text")
   .attr("x", -50)
