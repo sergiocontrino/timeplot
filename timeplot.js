@@ -185,6 +185,7 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
         .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
       })
     .append("text")
+    .attr("class", "toptip")
     .attr("x", function(d) { return Math.max((d[2]*sf - 25), 0)})
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
@@ -226,7 +227,6 @@ bar.append("a")
 
 svg.append("g")
 .attr("class","legend")
-//.attr("transform","translate(" + (width - margin.left)  + "," + 2*margin.top +")")
 .attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
 .style("font-size","12px")
 .call(d3.legend);
@@ -244,9 +244,6 @@ svg.append("g")
 }
 
 
-
-
-
 var range = function(d) {
   //var beginning = x(d[0]);
   var beginning = 0;
@@ -261,6 +258,8 @@ var rescale = function() {
   var newwidth = parseInt(svg.style("width"));
   var max = d3.max(data, function(d) { return +d[2];} );
   var newgraphW= (newwidth - 3*margin.left);
+
+var sf = newgraphW/max;
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
   //x.range([0, newwidth]);
@@ -279,6 +278,10 @@ var rescale = function() {
       .attr("height", barHeight - 1)
       .style("fill", function(d, i) { return colors(d[6])});
 
+  // reposition top text too
+  bar.select(".toptip").attr("x", function(d) { return Math.max((d[2]*sf - 25), 0)});
+
+
   // Also reposition the bars using the new scales.
   // bar.select("text")
   //     //.attr("x", function(d) { return range(d) - 3; })
@@ -288,6 +291,9 @@ var rescale = function() {
   //     .attr("dy", ".35em")
   //     // .text(function(d) { return (d[0] + "..." + d[1] + " " + d[2]+": " + d[3] + " " + d[4])});
   //     .text(function(d) { return (d[6] + ": " + d[2] )});
+
+  // reposition legend
+  var lb = svg.select(".legend").attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
 
   // resize the bounding box
   var bb = svg.select(".boundingbox").attr("width", newwidth -15);
