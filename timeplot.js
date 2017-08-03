@@ -185,12 +185,13 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
         .attr({"xlink:title":  d[0] + ": " + d[5] + " " + d[6] + " -> " + d[2] + " " + d[3]});
       })
     .append("text")
-    .attr("x", 0)
+    .attr("x", function(d) { return Math.max((d[2]*sf - 25), 0)})
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
     //.attr("fill", "gray")
-    .attr("font-size", "10px")
-    .text(function(d) { return (d[6] + ": " + d[2] )});
+    .attr("font-size", 1.2*barHeight + "px")
+    //.text(function(d) { return (d[6] + ": " + d[2] )});
+    .text(function(d) { return (d[2])});
 
 bar.append("a")
   .on("mouseover", function(d){
@@ -201,6 +202,8 @@ bar.append("a")
   .attr("x", -50)
   .attr("y", barHeight / 2)
   .attr("dy", ".35em")
+  .attr("font-size", 1.2*barHeight + "px")
+  //.attr("fill", "gray")
   // group by replicates
   .text(function(d,i) { if (i == 0 || i%3 == 2) return (d[5])});
 
@@ -227,6 +230,16 @@ svg.append("g")
 .attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
 .style("font-size","12px")
 .call(d3.legend);
+
+// explanatory text, when we know...
+  //  svg.append("text")
+  //   .attr("class", "note1")
+  //   .attr("x", margin.left + max*sf + 2*barHeight)
+  //   .attr("y", 3*margin.top)
+  //   .style("font-size", 1.2*barHeight +"px")
+  //   .style("fill", "gray")
+  //   .text("Levels expressed in Transcript Per Million (TPM).")
+  //   ;
 
 }
 
