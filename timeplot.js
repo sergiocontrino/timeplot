@@ -94,12 +94,11 @@ var EPORTAL = "portal.do?class=RnaseqExperiment&externalids=";
 
 //================
 
-
 var svg = d3.select("#" + svgId);
 var colors = d3.scale.category20();
 
 // margins
-var margin = {top: 40, right: 120, bottom: 30, left: 60}
+var margin = {top: 40, right: 180, bottom: 30, left: 60}
 
 // Original Width
 var width = parseInt(svg.style("width"));
@@ -107,14 +106,16 @@ var width = parseInt(svg.style("width"));
 // Store our scale so that it's accessible by all:
 var x= null;
 var xAxis = null;
+var max = null;
 
 // Static bar type:
 var barHeight = 10;
 
 var render = function() {
 
-var graphW = width -3*margin.left ;
-var max = d3.max(data, function(d) { return +d[2];} );
+var graphW = width - margin.right; // graph width
+
+max = d3.max(data, function(d) { return +d[2];} );
 var sf = graphW/max;  //scale factor
 
 var groups=(data.length -1)/replicatesNr;   // -1: the starting state (grass)
@@ -142,7 +143,6 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
       .attr('y', 0)
       .attr('width', width)
       .attr('height', 20)
-      //.attr('fill', )
       .append("xhtml:body")
       .html('<h3 class="goog"> ' + groups + ' Digestion Time Points </h3>\
              <p> <p>');
@@ -150,7 +150,6 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
   // Size our SVG tall enough so that it fits each bar.
   // Width was already defined when we loaded.
   svg.attr("height", margin.top + (barHeight * (data.length + groups) + margin.bottom));
-
   }
 
   // Draw our elements!!
@@ -189,9 +188,7 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
     .attr("x", function(d) { return Math.max((d[2]*sf - 25), 0)})
     .attr("y", barHeight / 2)
     .attr("dy", ".35em")
-    //.attr("fill", "gray")
     .attr("font-size", 1.2*barHeight + "px")
-    //.text(function(d) { return (d[6] + ": " + d[2] )});
     .text(function(d) { return (d[2])});
 
 bar.append("a")
@@ -209,27 +206,27 @@ bar.append("a")
   .text(function(d,i) { if (i == 0 || i%3 == 2) return (d[5])});
 
   svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", function(d, i) {
-        //return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
-        return "translate(" + margin.left  + "," + (margin.top + (barHeight * (data.length + groups)) + 5 ) + ")"})
-      .call(xAxis);
+    .attr("class", "x axis")
+    .attr("transform", function(d, i) {
+      //return "translate( 0 " + "," + (margin.top + (barHeight * data.length) +5 ) + ")"})
+      return "translate(" + margin.left  + "," + (margin.top + (barHeight * (data.length + groups)) + 5 ) + ")"})
+    .call(xAxis);
 
-    svg.append("rect")
-      .attr("class", "boundingbox")
-      .attr("x", 0)
-      .attr("y", (margin.top - 5))
-      .attr("height", (10 + barHeight * (data.length + groups)))
-      .attr("width", width -15)
-      .style("stroke", "grey")
-      .style("fill", "none")
-      .style("stroke-width", 1);
+  svg.append("rect")
+    .attr("class", "boundingbox")
+    .attr("x", 0)
+    .attr("y", (margin.top - 5))
+    .attr("height", (10 + barHeight * (data.length + groups)))
+    .attr("width", width -15)
+    .style("stroke", "grey")
+    .style("fill", "none")
+    .style("stroke-width", 1);
 
-svg.append("g")
-.attr("class","legend")
-.attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
-.style("font-size","12px")
-.call(d3.legend);
+  svg.append("g")
+    .attr("class","legend")
+    .attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
+    .style("font-size","12px")
+    .call(d3.legend);
 
 // explanatory text, when we know...
   //  svg.append("text")
@@ -244,22 +241,19 @@ svg.append("g")
 }
 
 
-var range = function(d) {
-  //var beginning = x(d[0]);
-  var beginning = 0;
-  var end = x(d[2]);
-  var range = end - beginning;
-  return range;
-}
+// var range = function(d) {
+//   //var beginning = x(d[0]);
+//   var beginning = 0;
+//   var end = x(d[2]);
+//   var range = end - beginning;
+//   return range;
+// }
 
 var rescale = function() {
-
   // The new width of the SVG element
   var newwidth = parseInt(svg.style("width"));
-  var max = d3.max(data, function(d) { return +d[2];} );
-  var newgraphW= (newwidth - 3*margin.left);
-
-var sf = newgraphW/max;
+  var newgraphW= (newwidth - margin.right);
+  var sf = newgraphW/max;
 
   // Our input hasn't changed (domain) but our range has. Rescale it!
   //x.range([0, newwidth]);
@@ -274,13 +268,13 @@ var sf = newgraphW/max;
 
   // For each bar group, select the rect and reposition it using the new scale.
   bar.select("rect")
-      .attr("width", function(d) { return range(d); })
+      //.attr("width", function(d) { return range(d); })
+      .attr("width", function(d) { return (sf*d[2]); })
       .attr("height", barHeight - 1)
       .style("fill", function(d, i) { return colors(d[6])});
 
   // reposition top text too
   bar.select(".toptip").attr("x", function(d) { return Math.max((d[2]*sf - 25), 0)});
-
 
   // Also reposition the bars using the new scales.
   // bar.select("text")
