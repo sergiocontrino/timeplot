@@ -134,7 +134,7 @@ console.log("WWW " + width + " MAX: " + max + " -- " + groups);
   // when no results don't display anything
   svg.attr("height", 0);
 
-  if (data.length > 0) {
+  if (data.length > 0 && max > 0) {
 
   // Build the report header
     head = svg.append('foreignObject')
