@@ -225,7 +225,10 @@ bar.append("a")
   svg.append("g")
     .attr("class","legend")
     .attr("transform","translate(" + (margin.left + max*sf + 2*barHeight)  + "," + 2*margin.top +")")
+    .style("stroke", "black")
     .style("font-size","12px")
+    .style("fill", "none")
+    .style("stroke-width", .8)
     .call(d3.legend);
 
 // explanatory text, when we know...
