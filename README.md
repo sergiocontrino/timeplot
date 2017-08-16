@@ -1,2 +1,2 @@
 # timeplot
-box plot for small sample time serie
+bar plot for small sample (replicates) time series
