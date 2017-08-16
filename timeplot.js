@@ -26,9 +26,9 @@ if(typeof queryId === 'undefined'){
    queryId = DEFAULT_ID;
  };
 
-//if(typeof svgId === 'undefined'){
+if(typeof svgId === 'undefined'){
    svgId = DEFAULT_SVG;
-// };
+ };
 
 if(typeof type === 'undefined'){
    type  = DEFAULT_TYPE;
